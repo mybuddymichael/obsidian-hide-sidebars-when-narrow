@@ -1,62 +1,49 @@
-import { App, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { App, Plugin, PluginSettingTab, Setting } from 'obsidian';
 
 interface HideSidebarsWhenNarrowSettings {
-  leftWidth: number;
-  rightWidth: number;
 }
 
 const DEFAULT_SETTINGS: HideSidebarsWhenNarrowSettings = {
-  leftWidth: 200,
-  rightWidth: 200,
 }
 
 export default class HideSidebarsWhenNarrowPlugin extends Plugin {
   settings: HideSidebarsWhenNarrowSettings;
 
   async onload() {
-    console.log('loading plugin');
+    console.log('loading HideSideBarsWhenNarrowPlugin');
+    this.app.workspace.onLayoutReady(() => {
+      this.loadSettings().then(() => {
+        // this.addSettingTab(new SampleSettingTab(this.app, this));
 
-    await this.loadSettings();
+        this.toggleSidebars();
 
-    this.addRibbonIcon('dice', 'Sample Plugin', () => {
-      new Notice('This is a notice!');
-    });
-
-    this.addStatusBarItem().setText('Status Bar Text');
-
-    this.addCommand({
-      id: 'open-sample-modal',
-      name: 'Open Sample Modal',
-      // callback: () => {
-      // 	console.log('Simple Callback');
-      // },
-      checkCallback: (checking: boolean) => {
-        let leaf = this.app.workspace.activeLeaf;
-        if (leaf) {
-          if (!checking) {
-            new SampleModal(this.app).open();
-          }
-          return true;
-        }
-        return false;
-      }
-    });
-
-    this.addSettingTab(new SampleSettingTab(this.app, this));
-
-    this.registerCodeMirror((cm: CodeMirror.Editor) => {
-      console.log('codemirror', cm);
-    });
-
-    this.registerDomEvent(document, 'click', (evt: MouseEvent) => {
-      console.log('click', evt);
-    });
-
-    this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
+        this.registerDomEvent(window, 'resize', (_) => {
+          window.setTimeout(this.toggleSidebars, 100)
+        });
+      });
+    })
   }
 
   onunload() {
     console.log('unloading plugin');
+  }
+
+  toggleSidebars() {
+    const width = window.outerWidth;
+    // TODO: make these widths configurable
+    if (width < 1400 && width >= 1001) {
+      // collapse left only
+      !this.app.workspace.leftSplit.collapsed && this.app.workspace.leftSplit.collapse();
+      this.app.workspace.rightSplit.collapsed && this.app.workspace.rightSplit.expand();
+    } else if (width < 1000) {
+      // collapse both
+      !this.app.workspace.rightSplit.collapsed && this.app.workspace.rightSplit.collapse();
+      !this.app.workspace.leftSplit.collapsed && this.app.workspace.leftSplit.collapse();
+    } else {
+      // expand all
+      this.app.workspace.leftSplit.collapsed && this.app.workspace.leftSplit.expand();
+      this.app.workspace.rightSplit.collapsed && this.app.workspace.rightSplit.expand();
+    }
   }
 
   async loadSettings() {
@@ -68,23 +55,7 @@ export default class HideSidebarsWhenNarrowPlugin extends Plugin {
   }
 }
 
-class SampleModal extends Modal {
-  constructor(app: App) {
-    super(app);
-  }
-
-  onOpen() {
-    let { contentEl } = this;
-    contentEl.setText('Woah!');
-  }
-
-  onClose() {
-    let { contentEl } = this;
-    contentEl.empty();
-  }
-}
-
-class SampleSettingTab extends PluginSettingTab {
+class SettingsTab extends PluginSettingTab {
   plugin: HideSidebarsWhenNarrowPlugin;
 
   constructor(app: App, plugin: HideSidebarsWhenNarrowPlugin) {
