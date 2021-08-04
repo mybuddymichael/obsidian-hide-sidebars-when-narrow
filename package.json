@@ -1,7 +1,7 @@
 {
-  "name": "obsidian-sample-plugin",
-  "version": "0.12.0",
-  "description": "This is a sample plugin for Obsidian (https://obsidian.md)",
+  "name": "obsidian-hide-sidebars-when-narrow",
+  "version": "1.0.0",
+  "description": "This Obsidian plugin hides the sidebars when the window is narrow.",
   "main": "main.js",
   "scripts": {
     "dev": "rollup --config rollup.config.js -w",
