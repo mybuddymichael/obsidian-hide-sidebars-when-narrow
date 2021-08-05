@@ -22,14 +22,13 @@ export default class HideSidebarsWhenNarrowPlugin extends Plugin {
         this.toggleSidebars();
 
         this.registerDomEvent(window, 'resize', (_) => {
-          window.setTimeout(this.toggleSidebars.bind(this), 100);
+          window.setTimeout(this.toggleSidebars.bind(this), 80);
         });
       });
     });
   }
 
   toggleSidebars() {
-    console.log(this.settings);
     const width = window.outerWidth;
     if (width < this.settings.leftMinWidth) {
       !this.app.workspace.leftSplit.collapsed &&
@@ -73,8 +72,10 @@ class SettingsTab extends PluginSettingTab {
     containerEl.createEl('h3', { text: 'Hide Sidebars When Narrow' });
 
     new Setting(containerEl)
-      .setName('Minimum window width for the left sidebar')
-      .setDesc('How wide should the window be for the left sidebar to show?')
+      .setName('Hide the left sidebar when the window is this narrow')
+      .setDesc(
+        'Increase this to hide the left sidebar sooner; decrease it to delay hiding'
+      )
       .addText((text) =>
         text
           .setPlaceholder(`Default: ${DEFAULT_SETTINGS.leftMinWidth}`)
@@ -91,8 +92,10 @@ class SettingsTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName('Minimum window width for the right sidebar')
-      .setDesc('How wide should the window be for the right sidebar to show?')
+      .setName('Hide the right sidebar when the window is this narrow')
+      .setDesc(
+        'Increase this to hide the right sidebar sooner; decrease it to delay hiding'
+      )
       .addText((text) =>
         text
           .setPlaceholder(`Default: ${DEFAULT_SETTINGS.rightMinWidth}`)
