@@ -3,7 +3,7 @@
 	"name": "Hide Sidebars When Narrow",
 	"version": "1.0.0",
 	"minAppVersion": "0.12.12",
-	"description": "Automatically hide the sidebars when your window is narrow.",
+	"description": "Automatically hides the sidebars when your window is narrow.",
 	"author": "Michael Hanson",
 	"authorUrl": "https://github.com/mybuddymichael",
 	"isDesktopOnly": true
