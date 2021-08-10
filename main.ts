@@ -1,4 +1,4 @@
-import { App, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { App, debounce, Plugin, PluginSettingTab, Setting } from 'obsidian';
 
 interface HideSidebarsWhenNarrowSettings {
   leftMinWidth: number;
@@ -19,11 +19,11 @@ export default class HideSidebarsWhenNarrowPlugin extends Plugin {
     await this.loadSettings();
     this.addSettingTab(new SettingsTab(this.app, this));
 
+    const debouncedToggle = debounce(this.toggleSidebars.bind(this), 80);
     this.app.workspace.onLayoutReady(() => {
       this.toggleSidebars();
-
       this.registerDomEvent(window, 'resize', (_) => {
-        window.setTimeout(this.toggleSidebars.bind(this), 80);
+        debouncedToggle();
       });
     });
   }
