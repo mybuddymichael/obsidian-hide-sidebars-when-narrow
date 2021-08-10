@@ -15,15 +15,15 @@ export default class HideSidebarsWhenNarrowPlugin extends Plugin {
 
   async onload() {
     console.log('loading HideSideBarsWhenNarrowPlugin');
+
+    await this.loadSettings();
+    this.addSettingTab(new SettingsTab(this.app, this));
+
     this.app.workspace.onLayoutReady(() => {
-      this.loadSettings().then(() => {
-        this.addSettingTab(new SettingsTab(this.app, this));
+      this.toggleSidebars();
 
-        this.toggleSidebars();
-
-        this.registerDomEvent(window, 'resize', (_) => {
-          window.setTimeout(this.toggleSidebars.bind(this), 80);
-        });
+      this.registerDomEvent(window, 'resize', (_) => {
+        window.setTimeout(this.toggleSidebars.bind(this), 80);
       });
     });
   }
