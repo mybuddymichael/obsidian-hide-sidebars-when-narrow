@@ -29,7 +29,7 @@ export default class HideSidebarsWhenNarrowPlugin extends Plugin {
   }
 
   toggleSidebars() {
-    const width = window.outerWidth;
+    const width = window.innerWidth;
     if (width < this.settings.leftMinWidth) {
       !this.app.workspace.leftSplit.collapsed &&
         this.app.workspace.leftSplit.collapse();
