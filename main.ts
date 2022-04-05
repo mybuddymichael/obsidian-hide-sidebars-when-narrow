@@ -12,7 +12,6 @@ const DEFAULT_SETTINGS: HideSidebarsWhenNarrowSettings = {
 
 export default class HideSidebarsWhenNarrowPlugin extends Plugin {
   settings: HideSidebarsWhenNarrowSettings;
-  previousWidth: number;
 
   async onload() {
     console.log('loading HideSideBarsWhenNarrowPlugin');
@@ -22,7 +21,6 @@ export default class HideSidebarsWhenNarrowPlugin extends Plugin {
 
     const debouncedToggle = debounce(this.toggleSidebars.bind(this), 80);
     this.app.workspace.onLayoutReady(() => {
-      this.previousWidth = window.innerWidth;
       this.toggleSidebars();
       this.registerDomEvent(window, 'resize', (_) => {
         debouncedToggle();
@@ -32,30 +30,20 @@ export default class HideSidebarsWhenNarrowPlugin extends Plugin {
 
   toggleSidebars() {
     const width = window.innerWidth;
-
-    if (width < this.settings.leftMinWidth &&
-      width < this.previousWidth &&
-      !this.app.workspace.leftSplit.collapsed) {
-      this.app.workspace.leftSplit.collapse();
+    if (width < this.settings.leftMinWidth) {
+      !this.app.workspace.leftSplit.collapsed &&
+        this.app.workspace.leftSplit.collapse();
+    } else {
+      this.app.workspace.leftSplit.collapsed &&
+        this.app.workspace.leftSplit.expand();
     }
-    else if (width > this.settings.leftMinWidth &&
-      width > this.previousWidth &&
-      this.app.workspace.leftSplit.collapsed) {
-      this.app.workspace.leftSplit.expand();
+    if (width < this.settings.rightMinWidth) {
+      !this.app.workspace.rightSplit.collapsed &&
+        this.app.workspace.rightSplit.collapse();
+    } else {
+      this.app.workspace.rightSplit.collapsed &&
+        this.app.workspace.rightSplit.expand();
     }
-
-    if (width < this.settings.rightMinWidth &&
-      width < this.previousWidth &&
-      !this.app.workspace.rightSplit.collapsed) {
-      this.app.workspace.rightSplit.collapse();
-    }
-    else if (width > this.settings.rightMinWidth &&
-      width > this.previousWidth &&
-      this.app.workspace.rightSplit.collapsed) {
-      this.app.workspace.rightSplit.expand();
-    }
-
-    this.previousWidth = width;
   }
 
   async loadSettings() {
@@ -77,7 +65,7 @@ class SettingsTab extends PluginSettingTab {
   }
 
   display(): void {
-    const { containerEl } = this;
+    let { containerEl } = this;
 
     containerEl.empty();
 
